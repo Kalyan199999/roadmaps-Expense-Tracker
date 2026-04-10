@@ -74,6 +74,14 @@ const login = async (req,res)=>
     {
         const { email , password } = req.body;
 
+        if( !password || !email )
+        {
+            return res.status(404).json({
+                ok:false,
+                message:"Fields can not be empty!"
+            })
+        }
+
         const sql = 'select id, username ,password from  user where email = ?';
 
         const [ result ] = await pool.execute( sql , [email]);
