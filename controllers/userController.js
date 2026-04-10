@@ -16,6 +16,7 @@ const signUp = async (req,res)=>
             })
         }
 
+        // check the email is already exists
         const [ users ] = await pool.execute( 'select email from user where email=? ' , [ email ] );
 
         if( users.length > 0 )
@@ -31,7 +32,7 @@ const signUp = async (req,res)=>
         const query = 'insert into user(username,email,password) values(?,?,?)';
 
         const [ result  ] = await pool.execute( query , [username,email,hashPaaword] );
-
+        
         if( result.affectedRows === 0 )
         {
             return res.statsu(400).json({
@@ -39,20 +40,22 @@ const signUp = async (req,res)=>
                 message:"Sign up failed!Try again"
             })
         }
-
+        
+        const sql = 'select id, username,email from  user where email = ?'
+        
+        const [ user ] = await pool.execute( sql , [ email] )
+        
         const secrete_key = process.env.SCRETE_KEY
 
         const token = jwt.sign( {
+            id:user[0].id,
             email:email,
             username:username
         } ,secrete_key,{ expiresIn:'1h' } )
 
         return res.status(201).json({
             ok:true,
-            data:{
-                username:username,
-                email:email
-            },
+            data:user[0],
             token
         })
     }
@@ -86,7 +89,7 @@ const login = async (req,res)=>
 
         const user = result[0];
 
-        const hash = await user.password;
+        const hash = user.password;
 
         const isTrue = await bcrypt.compare( password , hash )
 
