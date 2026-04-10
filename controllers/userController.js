@@ -40,9 +40,8 @@ const signUp = async (req,res)=>
                 message:"Sign up failed!Try again"
             })
         }
-        
         const sql = 'select id, username,email from  user where email = ?'
-        
+
         const [ user ] = await pool.execute( sql , [ email] )
         
         const secrete_key = process.env.SCRETE_KEY
