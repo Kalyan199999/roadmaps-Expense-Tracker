@@ -28,7 +28,7 @@ const verify = async (req,res,next)=>
         const user = jwt.verify( token,key );
 
         // add the use info to req to use in coming the functions of this present route
-        res.user = user;
+        req.user = user;
 
         // call the next function
         next();
