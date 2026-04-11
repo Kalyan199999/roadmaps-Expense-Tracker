@@ -6,6 +6,7 @@ create table if not exists expense(
     category varchar(50) not null,
     product_name varchar(50) not null,
     amount int not null,
+    date dattime not null,
     primary key(expense_id),
     constraint fk_user foreign key(user_id)  references user(id)
 );
