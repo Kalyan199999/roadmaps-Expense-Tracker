@@ -117,7 +117,67 @@ const userExpenses = async (req,res)=>
     }
 }
 
+const userExpenseCustomDate = async (req,res)=>
+{
+    try
+    {
+        const { start , end } = req.query;
+
+        if( !start || !end )
+        {
+            return res.status(404).json({
+                ok:false,
+                message:"Please specify the custom dates!"
+            })
+        }
+        
+        const user = req.user;
+
+        const query = "select category,product_name,amount,date from  expense where user_id = ? and date between ? and ?";
+
+        const [result] = await pool.execute( query , [ user.id, start, end ] );
+
+        return res.status(200).json({
+            ok:true,
+            data:result
+        })
+    }
+    catch(err)
+    {
+        return res.status(500).json({
+            ok:false,
+            message:err.message
+        })
+    }
+}
+
+const userExpenseForWeek = async (req,res)=>
+{
+    try
+    {
+        const user = req.user;
+
+        const query = "select category,product_name,amount,date from  expense where user_id = ? and DATEDIFF(CURDATE(), date) <= 7";
+
+        const [ result ] =await pool.execute( query ,[user.id]);
+
+        return res.status(200).json({
+            ok:true,
+            data:result
+        })
+    }
+    catch(err)
+    {
+        return res.status(500).json({
+            ok:false,
+            message:err.message
+        })
+    }
+}
+
 module.exports = {
     addExpense,
-    userExpenses
+    userExpenses,
+    userExpenseCustomDate,
+    userExpenseForWeek
 }
