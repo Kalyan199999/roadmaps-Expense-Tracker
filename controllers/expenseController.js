@@ -209,8 +209,7 @@ const updateExpense = async (req,res)=>
 
         return res.status(200).json({
             ok:true,
-            message: "Expense updated successfully",
-            message:result
+            message: "Expense updated successfully"
         })
     }
     catch(err)
