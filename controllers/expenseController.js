@@ -181,21 +181,21 @@ const updateExpense = async (req,res)=>
     {
         const user = req.user;
 
-        const { category ,amount , product_name } = req.body;
+        const { amount , expense_id } = req.body;
         
-        if( !category || !amount || !product_name )
+        if(  !amount || !expense_id )
         {
             return res.status(400).json({
                 ok:false,
-                message:"Category,Product name and amount can not be null!"
+                message:"expense_id and amount can not be null!"
             })
         }
 
-        const query = "update expense set amount=? ,date=? where user_id=? and lower(category)=? and lower(product_name)=?";
+        const query = "update expense set amount=? ,date=? where user_id=? and expense_id=?";
 
         const curDate = new Date();
 
-        const values = [ amount,curDate,user.id,category.trim().toLowerCase(),product_name.trim().toLowerCase()];
+        const values = [ amount,curDate,user.id,expense_id];
 
         const [ result ] = await pool.execute( query , values );
 
