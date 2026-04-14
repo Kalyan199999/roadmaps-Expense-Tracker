@@ -175,9 +175,57 @@ const userExpenseForWeek = async (req,res)=>
     }
 }
 
+const updateExpense = async (req,res)=>
+{
+    try
+    {
+        const user = req.user;
+
+        const { category ,amount , product_name } = req.body;
+        
+        if( !category || !amount || !product_name )
+        {
+            return res.status(400).json({
+                ok:false,
+                message:"Category,Product name and amount can not be null!"
+            })
+        }
+
+        const query = "update expense set amount=? ,date=? where user_id=? and lower(category)=? and lower(product_name)=?";
+
+        const curDate = new Date();
+
+        const values = [ amount,curDate,user.id,category.trim().toLowerCase(),product_name.trim().toLowerCase()];
+
+        const [ result ] = await pool.execute( query , values );
+
+        if( result.affectedRows === 0 )
+        {
+            return res.status(404).json({
+                ok:false,
+                message:"No record found with those details to update."
+            })
+        }
+
+        return res.status(200).json({
+            ok:true,
+            message: "Expense updated successfully",
+            message:result
+        })
+    }
+    catch(err)
+    {
+        return res.status(500).json({
+            ok:false,
+            message:err.message
+        })
+    }
+}
+
 module.exports = {
     addExpense,
     userExpenses,
     userExpenseCustomDate,
-    userExpenseForWeek
+    userExpenseForWeek,
+    updateExpense
 }
